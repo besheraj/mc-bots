@@ -7,7 +7,7 @@ import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(''),
+    MongooseModule.forRoot('mongodb://root:example@mongo:27017/'),
     MongoCollectionModule,
     BullModule.forRoot({
       redis: {

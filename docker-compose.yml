@@ -7,14 +7,15 @@ services:
     networks:
       - local_dev
     build:
-      dockerfile: be/Dockerfile
+      context: be
+      dockerfile: Dockerfile
     volumes:
-      - ./:/app/
+      - ./be/:/app/
     depends_on:
       - mongo
       - redis
-    env_file:
-      - ./.env.development
+    # env_file:
+    #   - ./.env.development
     ports:
       - "8100:8100"
 
@@ -23,14 +24,15 @@ services:
     networks:
       - local_dev
     build:
-      dockerfile: bot/Dockerfile
+      context: bot
+      dockerfile: Dockerfile
     volumes:
-      - ./:/app/
+      - ./bot/:/app/
     depends_on:
       - mongo
       - redis
-    env_file:
-      - ./.env.development
+    # env_file:
+    #   - ./.env.development
     ports:
       - "8200:8200"
 
@@ -46,7 +48,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
 
   redis:
-    container_name: mongo
+    container_name: redis
     networks:
       - local_dev
     image: redis:6.2-alpine
