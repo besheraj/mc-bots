@@ -1,0 +1,56 @@
+version: "3.8"
+networks:
+  local_dev:
+services:
+  backend:
+    container_name: "backend"
+    networks:
+      - local_dev
+    build:
+      dockerfile: be/Dockerfile
+    volumes:
+      - ./:/app/
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - ./.env.development
+    ports:
+      - "8100:8100"
+
+  bot:
+    container_name: "bot"
+    networks:
+      - local_dev
+    build:
+      dockerfile: bot/Dockerfile
+    volumes:
+      - ./:/app/
+    depends_on:
+      - mongo
+      - redis
+    env_file:
+      - ./.env.development
+    ports:
+      - "8200:8200"
+
+  mongo:
+    container_name: mongo
+    networks:
+      - local_dev
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  redis:
+    container_name: mongo
+    networks:
+      - local_dev
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
