@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MongoCollectionModule } from './database/collections.modules';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BullModule } from '@nestjs/bull';
+import { ProcessOrders } from './app.processor';
 
 @Module({
   imports: [
@@ -11,7 +10,7 @@ import { BullModule } from '@nestjs/bull';
     MongoCollectionModule,
     BullModule.forRoot({
       redis: {
-        host: '',
+        host: 'redis',
         port: 6379,
       },
       prefix: 'orders',
@@ -21,7 +20,6 @@ import { BullModule } from '@nestjs/bull';
     ),
 
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [ProcessOrders],
 })
 export class AppModule {}

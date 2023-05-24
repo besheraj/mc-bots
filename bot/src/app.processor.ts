@@ -13,12 +13,16 @@ export class ProcessOrders {
 
   @Process('process-order')
   async processOrder(job: Job<any>) {
+    console.log(job, "job received") 
     try {
       await this.timeout(10000);
-      this.orderModel.updateOne(
+      console.log("job completed")
+      await this.orderModel.updateOne(
         { orderNumber: job.data.orderNumber },
         { status: 'COMPLETED' },
       );
+      console.log("job updated")
+
     } catch (e) {
         throw e
     }

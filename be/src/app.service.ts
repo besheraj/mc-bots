@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import moment from 'moment';
+import * as moment from 'moment';
 import { Orders, OrdersDocument } from './database/order.schema';
 import { Model } from 'mongoose';
 import { InjectQueue } from '@nestjs/bull';
@@ -41,6 +41,14 @@ export class AppService {
     return (orderNumber = parseInt(`${moment().format('MMDDYYYY')}00001`));
   }
 
+  async getOrders() {
+    try {
+      return this.orderModel.find();
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async createOrder(order: { vip: boolean }) {
     try {
       const orderNumber = await this.createOrderNumber();
@@ -52,16 +60,33 @@ export class AppService {
         await this.orderQueue.add(
           'process-order',
           {
-            newOrder,
+            ...newOrder,
           },
-          { priority: 1 },
+          {
+            priority: 1,
+            attempts: 3,
+            backoff: {
+              type: 'exponential',
+              delay: 1000,
+            },
+          },
         );
         return 'order in the queue!';
       }
 
-      await this.orderQueue.add('process-order', {
-        newOrder,
-      });
+      await this.orderQueue.add(
+        'process-order',
+        {
+          ...newOrder,
+        },
+        {
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 1000,
+          },
+        },
+      );
 
       return 'order in the queue!';
     } catch (e) {
